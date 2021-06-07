@@ -1,0 +1,23 @@
+---
+galaxy_info:
+  author: Tim Beermann
+  description: Role to setup a vault cluster unsealed by another vault
+  company: Betacloud Solutions GmbH
+  license: license (BSD, MIT)
+  min_ansible_version: 2.9
+  platforms:
+    - name: Ubuntu
+      versions:
+        - "focal"
+    - name: Debian
+      versions:
+        - "buster"
+  galaxy_tags:
+    - "vault"
+    - "hashicorp vault"
+    - "hashicorp-vault"
+    - "hashicorp"
+    - "cluster"
+    - "vault cluster"
+    - "vault-cluster"
+dependencies: []

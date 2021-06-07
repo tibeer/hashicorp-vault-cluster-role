@@ -1,0 +1,37 @@
+---
+# defaults file for hashicorp-vault-cluster-role
+manager_configuration_directory: "/opt/manager/configuration"
+
+docker_registry: index.docker.io
+docker_registry_service: "{{ docker_registry }}"
+docker_registry_vault: "{{ docker_registry_service }}"
+
+vault_host: "{{ ansible_default_ipv4.address }}"
+vault_port: 8200
+vault_tag: latest
+vault_image: "{{ docker_registry_vault }}/hashicorp/vault:{{ vault_tag }}"
+
+
+vault_generic_policy_name: autounseal
+
+vault_unsealer_inv_group_name: unsealer
+vault_unsealer_storage_path: /home/ubuntu/vault-data
+vault_unsealer_config_path: /home/ubuntu/config.hcl
+vault_unsealer_policy_path: /tmp/autounseal.hcl
+vault_unsealer_port: 8200
+vault_unsealer_cluster_port: "{{ vault_unsealer_port + 1 }}"
+vault_unsealer_default_lease_ttl: "168h"
+vault_unsealer_max_lease_ttl: "720h"
+vault_unsealer_tls_disable: "true"
+vault_unsealer_enable_ui: "true"
+
+vault_cluster_inv_group_name: cluster
+vault_cluster_storage_path: /home/ubuntu/vault-data
+vault_cluster_config_path: /home/ubuntu/config.hcl
+vault_cluster_port: 8200
+vault_cluster_cluster_port: "{{ vault_cluster_port + 1 }}"
+vault_cluster_default_lease_ttl: "168h"
+vault_cluster_max_lease_ttl: "720h"
+vault_cluster_tls_disable: "true"
+vault_cluster_enable_ui: "true"
+vault_cluster_tls_skip_verify: "true"

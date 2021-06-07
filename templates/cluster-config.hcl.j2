@@ -1,0 +1,29 @@
+cluster_addr      = "http://{{ inventory_hostname }}:{{ vault_cluster_cluster_port }}"
+api_addr          = "http://{{ inventory_hostname }}:{{ vault_cluster_port }}"
+default_lease_ttl = "{{ vault_cluster_default_lease_ttl }}"
+max_lease_ttl     = "{{ vault_cluster_max_lease_ttl }}"
+disable_mlock     = "true"
+ui                = "{{ vault_cluster_enable_ui }}"
+
+storage "raft" {
+  path    = "{{ vault_cluster_storage_path }}"
+  node_id = "node-{{ inventory_hostname }}"
+
+{% for node in groups[group_names[0]] %}
+  retry_join { leader_api_addr = "http://{{ node }}:{{ vault_cluster_port }}" }
+{% endfor %}
+}
+
+listener "tcp" {
+  address         = "{{ ansible_default_ipv4.address }}:{{ vault_cluster_port }}"
+  tls_disable     = "{{ vault_cluster_tls_disable }}"
+}
+
+seal "transit" {
+  address         = "http://{{ groups[vault_unsealer_inv_group_name][0] }}:{{ vault_unsealer_port }}"
+  token           = "{{ hostvars[groups[vault_unsealer_inv_group_name][0]]['unwrapped_token'] }}"
+  disable_renewal = "false"
+  key_name        = "{{ vault_generic_policy_name }}"
+  mount_path      = "transit/"
+  tls_skip_verify = "{{ vault_cluster_tls_skip_verify }}"
+}

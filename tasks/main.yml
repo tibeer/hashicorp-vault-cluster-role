@@ -1,0 +1,15 @@
+---
+# tasks file for hashicorp-vault-cluster-role
+- name: import vault-preparation
+  import_tasks: vault-preparation.yml
+
+- name: import vault-unsealer
+  import_tasks: vault-unsealer.yml
+  when: inventory_hostname in groups[vault_unsealer_inv_group_name]
+
+- name: import vault-cluster
+  import_tasks: vault-cluster.yml
+  when: inventory_hostname in groups[vault_cluster_inv_group_name]
+
+- name: import vault-output
+  import_tasks: vault-outputs.yml

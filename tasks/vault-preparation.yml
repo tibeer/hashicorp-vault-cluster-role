@@ -1,0 +1,17 @@
+---
+- name: PREPARATION - add hashicorp key
+  ansible.builtin.apt_key:
+    url: "{{ vault_hashicorp_gpg_key_url }}"
+  become: true
+
+- name: PREPARATION - add hashicorp repo
+  ansible.builtin.apt_repository:
+    repo: "deb {{ vault_hashicorp_release_url }}
+      {{ ansible_distribution_release }} main"
+  become: true
+
+- name: PREPARATION - install vault
+  ansible.builtin.apt:
+    name: vault
+    update_cache: true
+  become: true
