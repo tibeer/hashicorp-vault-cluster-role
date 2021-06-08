@@ -1,16 +1,9 @@
 ---
 # defaults file for hashicorp-vault-cluster-role
-manager_configuration_directory: "/opt/manager/configuration"
-
-docker_registry: index.docker.io
-docker_registry_service: "{{ docker_registry }}"
-docker_registry_vault: "{{ docker_registry_service }}"
-
-vault_host: "{{ ansible_default_ipv4.address }}"
-vault_port: 8200
-vault_tag: latest
-vault_image: "{{ docker_registry_vault }}/hashicorp/vault:{{ vault_tag }}"
-
+vault_docker_registry: index.docker.io
+vault_docker_tag: latest
+vault_docker_image:
+  "{{ vault_docker_registry }}/hashicorp/vault:{{ vault_docker_tag }}"
 
 vault_generic_policy_name: autounseal
 

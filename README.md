@@ -7,7 +7,8 @@ It is not (yet) idempotent!
 Requirements
 ------------
 
-- You may need to install `apt-transport-https`.
+- You may need to install `apt-transport-https`
+- You need to have docker installed
 - Four instances
   - One for the cluster unsealer
   - Three for the cluster

@@ -10,13 +10,25 @@
     dest: "{{ vault_cluster_config_path }}"
 
 - name: CLUSTER - start vault server
-  ansible.builtin.shell: "screen -dmS vault-cluster
-    vault server -config={{ vault_cluster_config_path }}"
+  community.docker.docker_container:
+    name: vault-cluster
+    state: started
+    image: "{{ vault_image }}"
+    command: vault server -config=/vault/config
+    ports:
+      - "{{ vault_cluster_port }}:{{ vault_cluster_port }}"
+      - "{{ vault_cluster_cluster_port }}:{{ vault_cluster_cluster_port }}"
+    volumes:
+      - "{{ vault_cluster_storage_path }}:/vault/raft"
+      - "{{ vault_cluster_config_path }}:/vault/config/config.hcl"
+    capabilities:
+      - IPC_LOCK
+  become: true
 
 - name: CLUSTER - init first vault cluster node
   ansible.builtin.shell: "vault operator init"
   retries: 3
-  delay: 5
+  delay: 10
   register: cluster_init_output
   until: cluster_init_output.rc == 0
   environment:

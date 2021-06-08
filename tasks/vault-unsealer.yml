@@ -10,13 +10,25 @@
     dest: "{{ vault_unsealer_config_path }}"
 
 - name: UNSEALER - start vault server
-  ansible.builtin.shell: "screen -dmS vault-unsealer
-    vault server -config={{ vault_unsealer_config_path }}"
+  community.docker.docker_container:
+    name: vault-unsealer
+    state: started
+    image: "{{ vault_image }}"
+    command: vault server -config=/vault/config
+    ports:
+      - "{{ vault_unsealer_port }}:{{ vault_unsealer_port }}"
+      - "{{ vault_unsealer_cluster_port }}:{{ vault_unsealer_cluster_port }}"
+    volumes:
+      - "{{ vault_unsealer_storage_path }}:/vault/raft"
+      - "{{ vault_unsealer_config_path }}:/vault/config/config.hcl"
+    capabilities:
+      - IPC_LOCK
+  become: true
 
 - name: UNSEALER - init vault
   ansible.builtin.shell: "vault operator init"
   retries: 3
-  delay: 5
+  delay: 10
   register: unsealer_init_output
   until: unsealer_init_output.rc == 0
   environment:
@@ -45,7 +57,7 @@
 - name: UNSEALER - enable vault transit engine
   ansible.builtin.shell: "vault secrets enable transit"
   retries: 3
-  delay: 5
+  delay: 10
   register: vault_is_ready
   until: vault_is_ready.rc == 0
   environment:
