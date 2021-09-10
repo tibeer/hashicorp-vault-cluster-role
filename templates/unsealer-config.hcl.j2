@@ -1,5 +1,5 @@
-cluster_addr      = "http://{{ inventory_hostname }}:{{ vault_unsealer_cluster_port }}"
-api_addr          = "http://{{ inventory_hostname }}:{{ vault_unsealer_port }}"
+cluster_addr      = "http://{{ vault_unsealer_host }}:{{ vault_unsealer_cluster_port }}"
+api_addr          = "http://{{ vault_unsealer_host }}:{{ vault_unsealer_port }}"
 default_lease_ttl = "{{ vault_unsealer_default_lease_ttl }}"
 max_lease_ttl     = "{{ vault_unsealer_max_lease_ttl }}"
 disable_mlock     = "true"
@@ -7,11 +7,11 @@ ui                = "{{ vault_unsealer_enable_ui }}"
 
 storage "raft" {
   path    = "/vault/raft"
-  node_id = "node-{{ inventory_hostname }}"
+  node_id = "node-{{ vault_unsealer_host }}"
 }
 
 listener "tcp" {
   address     = "0.0.0.0:{{ vault_unsealer_port }}"
-  tls_disable = "{{ vault_unsealer_tls_disable }}"
+  tls_disable = "{{ vault_unsealer_tls_disabled }}"
 }
 

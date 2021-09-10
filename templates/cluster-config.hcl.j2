@@ -1,5 +1,5 @@
-cluster_addr      = "http://{{ inventory_hostname }}:{{ vault_cluster_cluster_port }}"
-api_addr          = "http://{{ inventory_hostname }}:{{ vault_cluster_port }}"
+cluster_addr      = "http://{{ vault_cluster_host }}:{{ vault_cluster_cluster_port }}"
+api_addr          = "http://{{ vault_cluster_host }}:{{ vault_cluster_port }}"
 default_lease_ttl = "{{ vault_cluster_default_lease_ttl }}"
 max_lease_ttl     = "{{ vault_cluster_max_lease_ttl }}"
 disable_mlock     = "true"
@@ -7,7 +7,7 @@ ui                = "{{ vault_cluster_enable_ui }}"
 
 storage "raft" {
   path    = "/vault/raft"
-  node_id = "node-{{ inventory_hostname }}"
+  node_id = "node-{{ vault_cluster_host }}"
 
 {% for node in groups[group_names[0]] %}
   retry_join { leader_api_addr = "http://{{ node }}:{{ vault_cluster_port }}" }
@@ -16,15 +16,15 @@ storage "raft" {
 
 listener "tcp" {
   address     = "0.0.0.0:{{ vault_cluster_port }}"
-  tls_disable = "{{ vault_cluster_tls_disable }}"
+  tls_disable = "{{ vault_cluster_tls_disabled }}"
 }
 
 seal "transit" {
-  address         = "http://{{ groups[vault_unsealer_inv_group_name][0] }}:{{ vault_unsealer_port }}"
-  token           = "{{ hostvars[groups[vault_unsealer_inv_group_name][0]]['unwrapped_token'] }}"
+  address         = "http://{{ vault_unsealer_host }}:{{ vault_unsealer_port }}"
+  token           = "{{ vault_unsealer_unwrap_token }}"
   disable_renewal = "false"
-  key_name        = "{{ vault_generic_policy_name }}"
+  key_name        = "{{ vault_unsealer_policy_name }}"
   mount_path      = "transit/"
-  tls_skip_verify = "{{ vault_cluster_tls_skip_verify }}"
+  tls_skip_verify = "{{ vault_unsealer_tls_disabled }}"
 }
 

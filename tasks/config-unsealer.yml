@@ -1,0 +1,27 @@
+---
+- name: UNSEALER - create vault storage directory
+  ansible.builtin.file:
+    path: "{{ vault_unsealer_storage_path }}"
+    state: directory
+  register: vault_unsealer_install_status
+
+- name: UNSEALER - create vault vault_config
+  ansible.builtin.template:
+    src: unsealer-config.hcl.j2
+    dest: "{{ vault_unsealer_config_path }}"
+
+- name: UNSEALER - start vault server
+  community.docker.docker_container:
+    name: vault-unsealer
+    state: started
+    image: "{{ vault_image }}"
+    command: vault server -config=/vault/config
+    ports:
+      - "{{ vault_unsealer_port }}:{{ vault_unsealer_port }}"
+      - "{{ vault_unsealer_cluster_port }}:{{ vault_unsealer_cluster_port }}"
+    volumes:
+      - "{{ vault_unsealer_storage_path }}:/vault/raft"
+      - "{{ vault_unsealer_config_path }}:/vault/config/config.hcl"
+    capabilities:
+      - IPC_LOCK
+  become: true

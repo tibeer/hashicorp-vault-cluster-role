@@ -1,4 +1,2 @@
 ---
 # vars file for hashicorp-vault-cluster-role
-vault_hashicorp_gpg_key_url: https://apt.releases.hashicorp.com/gpg
-vault_hashicorp_release_url: https://apt.releases.hashicorp.com

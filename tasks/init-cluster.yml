@@ -1,0 +1,28 @@
+---
+- name: CLUSTER - init first vault cluster node
+  ansible.builtin.shell: "docker exec -it vault-cluster
+    VAULT_ADDR=http://{{ vault_cluster_host }}:{{ vault_cluster_port }}
+    vault operator init"
+  retries: 3
+  delay: 10
+  register: cluster_init_output
+  until: cluster_init_output.rc == 0
+
+- name: CLUSTER - save token and recovery keys
+  ansible.builtin.set_fact:
+    cluster_key_1: "{{ cluster_init_output.stdout_lines[0].split(' ')[3] }}"
+    cluster_key_2: "{{ cluster_init_output.stdout_lines[1].split(' ')[3] }}"
+    cluster_key_3: "{{ cluster_init_output.stdout_lines[2].split(' ')[3] }}"
+    cluster_key_4: "{{ cluster_init_output.stdout_lines[3].split(' ')[3] }}"
+    cluster_key_5: "{{ cluster_init_output.stdout_lines[4].split(' ')[3] }}"
+    cluster_token: "{{ cluster_init_output.stdout_lines[6].split(' ')[3] }}"
+
+- name: CLUSTER - print vault cluster credentials
+  debug:
+    msg:
+      - "Recover Key 1: {{ cluster_key_1 }}"
+      - "Recover Key 2: {{ cluster_key_2 }}"
+      - "Recover Key 3: {{ cluster_key_3 }}"
+      - "Recover Key 4: {{ cluster_key_4 }}"
+      - "Recover Key 5: {{ cluster_key_5 }}"
+      - "Root Token: {{ cluster_token }}"

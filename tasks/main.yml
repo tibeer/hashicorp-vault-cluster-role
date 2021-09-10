@@ -1,15 +1,23 @@
 ---
 # tasks file for hashicorp-vault-cluster-role
-- name: import vault-preparation
-  import_tasks: vault-preparation.yml
+- name: setup unsealer
+  block:
+    - name: import config-unsealer
+      import_tasks: config-unsealer.yml
 
-- name: import vault-unsealer
-  import_tasks: vault-unsealer.yml
-  when: inventory_hostname in groups[vault_unsealer_inv_group_name]
+    - name: import init-unsealer
+      import_tasks: config-unsealer.yml
+      when: vault_unsealer_install_status.changed
+  when: inventory_hostname in groups[unsealer_host_group_name]
+  run_once: true  # forces the fact to be available on all hosts
 
-- name: import vault-cluster
-  import_tasks: vault-cluster.yml
-  when: inventory_hostname in groups[vault_cluster_inv_group_name]
+- name: setup cluster
+  block:
+    - name: import config-cluster
+      import_tasks: config-cluster.yml
 
-- name: import vault-output
-  import_tasks: vault-outputs.yml
+    - name: import
+      import_tasks: init-cluster.yml
+      when: vault_cluster_install_status.changed
+      run_once: true
+  when: inventory_hostname in groups[cluster_hosts_group_name]
